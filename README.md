@@ -6,14 +6,16 @@ jobs via handshake, attending career fairs, and setting up appointments.
 
 This repo contains:
 
-Student_Dataset.ipynb -> contains code that joins and cleans all data, adn outputs a mega dataset with all the relevant variables
+Student_Dataset.ipynb contains 
+          
+          code that joins and cleans all data, adn outputs a mega dataset with all the relevant variables
 
 /data: contains 
 
           four csv files and 
           mega dataset that contains contains the final data to be used.
 
-The primary key of this data is student username, hence the data is on a student level
+          The primary key of this data is student username, hence the data is on a student level
 
 /script: contains 
          
