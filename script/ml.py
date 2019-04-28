@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from IPython.display import display
+#from IPython.display import display
 import matplotlib.pyplot as plt
 
 pd.options.display.max_rows = None
@@ -17,7 +17,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 #------------------------------------------------------------
 
-def ml(dfin):
+def ml(dfin, models = None, y_col = None, weight_plot=0):
     """ Runs either logistic regression or KNN through sklearn using both 
         dev and test set. The hyperparameter is set using a dev set. Post
         hyperparameter training uses train and dev set for training.
@@ -49,7 +49,9 @@ def ml(dfin):
         N_FOLDS = 10
     ACC_THRESH = 0.01 # dev set accuracy must be x% better to use new param   
 
-    models = ['KNN','LOGISTIC','TREE']
+    if models is None:
+        models = ['KNN','LOGISTIC','TREE']
+    
     for model in models:
         print('\nMODEL: ', model)
 
@@ -71,7 +73,13 @@ def ml(dfin):
 
         f1_test_a = np.zeros(N_FOLDS)
         f1_train_a = np.zeros(N_FOLDS)
+        
+        ncol = len(X_nd[0])
+        weight_list = [0]* ncol          
+        
         for i, (train, test) in enumerate(skf.split(X_nd,y_n)):
+
+            
             train_n = len(train)
             dev = train[:int(train_n/4)]  # empirically found that dev 1/4 is good
             sub_train = train[int(train_n/4):] # this is temporary train set
@@ -96,6 +104,8 @@ def ml(dfin):
             print('fold:',i,' best c:',best_c, ' dev:%.2f' % best_acc, ' dev_ones:%.2f' % (y_n[dev].sum()/len(dev)),end='')
             if model == 'LOGISTIC': 
                 clf = linear_model.LogisticRegression(penalty=regularizer,C=best_c)
+                clf1 = linear_model.LogisticRegression(penalty=regularizer,
+                                                                          C=best_c, n_jobs=-1)                
             elif model == 'KNN':           
                 clf = KNeighborsClassifier(n_neighbors=best_c, metric='euclidean',weights='uniform')
             else:
@@ -110,8 +120,37 @@ def ml(dfin):
 
             print(' acc_test:%.2f' % acc_test_a[i], ' acc_train:%.2f' % acc_train_a[i], 
                 ' f1_train:%.2f' % f1_train_a[i], ' f1_train:%.2f' % f1_train_a[i])
+            
+            ##------------------------------------------
+            ## Plotting Logisitic reg weights
+            d= df.drop('y',axis=1)
+            clust = list(d.columns.values)
+            # getting new fit using all the data
+            clf1.fit(X_nd, y_n)
+            if weight_plot == 1:
+                coeff=clf1.coef_[0]
+                weights_dict= dict(zip(clust,coeff))
+                wn0= {}
+                for k, v in weights_dict.items():
+                    if v == 0:
+                        wn0[k] = v
+                print ('  ',wn0)
+                weight_list = [x+y for x,y in zip(coeff,weight_list)] 
+                           
         print('Avg test acc:%.3f' % acc_test_a.mean(),'Avg train acc:%.3f' % acc_train_a.mean(),
-            'Avg f1 acc:%.3f' % f1_train_a.mean(),'Avg f1 acc:%.3f' % f1_train_a.mean())    
+            'Avg f1 acc:%.3f' % f1_train_a.mean(),'Avg f1 acc:%.3f' % f1_train_a.mean())
+        
+        if weight_plot == 1:
+            avgWeights= [x/N_FOLDS for x in weight_list]
+            x= clust
+            pos =[x for x in range(0,len(x))]
+            plt.bar(pos,avgWeights, align='center', alpha=0.5)
+            plt.xticks(pos, x,rotation=90)
+        
+            plt.ylabel('Avg Weight')
+            plt.title('y = '+ y_col+' model '+model )
+        
+            plt.show()              
 
 #----------------------------------------------------------------------
 
@@ -129,11 +168,13 @@ def plot(f0,f1,df):
 def run_models(df):
 
     y_list = ['Engaged_Jobs','Engaged_Fair','Engaged_Appointment']
-    feat_names = ['US Citizen','School Year Name','Educations Cumulative Gpa','Documents Count','Engaged_Fair',
-                'Engaged_Appointment','Engaged_Jobs']
+
 
     for y in y_list:
         df['y'] = df[y]
+        
+        feat_names = ['US Citizen','School Year Name','Educations Cumulative Gpa','Documents Count','Engaged_Fair',
+                    'Engaged_Appointment','Engaged_Jobs']        
 
         # feat_names = ['US Citizen','School Year Name','Educations Cumulative Gpa','Documents Count','Drop_in_advisor',
         #             'Appointment Type Length (Minutes)','days_before_due','pre_reg', 'check_in','Engaged_Fair',
@@ -150,7 +191,7 @@ def run_models(df):
         for c in df[usecols].columns:
             print(c,end=',')
 
-        ml(df[usecols])
+        ml(df[usecols],['LOGISTIC'],y_col = y, weight_plot=1)
 
 
 if __name__ == '__main__':
@@ -163,5 +204,4 @@ if __name__ == '__main__':
     run_models(df)
     
     
-    #plot('strong duchenne','6 only',df)
     print('end')
