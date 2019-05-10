@@ -169,6 +169,14 @@ def plot(f0,f1,df):
 #=============================================================================
 
 def run_models(df):
+"""
+df <- takes in mega data with all features
+In this function the ml model is called thrice 
+with three Engaged variables being the Y.
+
+Subset of features are also selected in this
+method -> feat_names
+"""
 
     y_list = ['Engaged_Jobs','Engaged_Fair','Engaged_Appointment']
 
