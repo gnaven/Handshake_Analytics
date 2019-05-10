@@ -1,7 +1,7 @@
----------------------------------------------------------------
+-----------------------------------------------------------------
 In this README, model for Machine Learning
 algorithms in Handshake Analytics has been shown
----------------------------------------------------------------
+-----------------------------------------------------------------
 
 How to run:
 You can run using the command line with python ml.py
@@ -9,7 +9,7 @@ To view weight plots from logistic regression, uncomment
 line 198 which calls ml and comment out line 201 which is
 also calling ml
 
----------------------------------------------------------------
+------------------------------------------------------------------
 Model explanation:
 
 run_models -> is the driver method where subset of features
