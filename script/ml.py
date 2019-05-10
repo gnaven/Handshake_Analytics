@@ -14,6 +14,8 @@ from sklearn import metrics
 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.simplefilter(action='ignore', category=UserWarning)
+
 
 #------------------------------------------------------------
 
@@ -126,8 +128,9 @@ def ml(dfin, models = None, y_col = None, weight_plot=0):
             d= df.drop('y',axis=1)
             clust = list(d.columns.values)
             # getting new fit using all the data
-            clf1.fit(X_nd, y_n)
             if weight_plot == 1:
+	    
+		#clf1.fit(X_nd, y_n)		
                 coeff=clf1.coef_[0]
                 weights_dict= dict(zip(clust,coeff))
                 wn0= {}
@@ -189,10 +192,15 @@ def run_models(df):
         usecols = ['y'] + list(feat_names)
 
         for c in df[usecols].columns:
-            print(c,end=',')
-
-        ml(df[usecols],['LOGISTIC'],y_col = y, weight_plot=1)
-
+            print(c,end=',')	    
+			
+	#for printing weights: only for logistic regression
+	#ml(df[usecols],['LOGISTIC'],y_col = y, weight_plot=1)
+	
+	#for running all models, no plots in this one
+        ml(df[usecols])
+		
+	
 
 if __name__ == '__main__':
 
