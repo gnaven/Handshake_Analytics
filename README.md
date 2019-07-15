@@ -10,7 +10,7 @@ Student_Dataset.ipynb contains
           
           code that joins and cleans all data, adn outputs a mega dataset with all the relevant variables
 
-/data: contains 
+/data: (deleted for privacy concerns) 
 
           four csv files and 
           mega dataset that contains contains the final data to be used.
